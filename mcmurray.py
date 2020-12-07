@@ -2,6 +2,10 @@ import pandas as pd
 import os
 
 CORPUS_PATH = os.path.join(os.path.dirname(__file__), '100k_links_b028')
+SCRABBLE_DIFFICULTY = {'a': 1, 'b': 3, 'c': 3, 'd': 2, 'e': 1,  'f': 4, 'g': 2,
+					'h': 4, 'i': 1, 'j': 8, 'k': 5, 'l': 1, 'm': 3, 'n': 1, 'o': 1,
+					'p': 3, 'q': 10, 'r': 1, 's': 1, 't': 1, 'u': 1, 'v': 4, 'w': 4,
+					'x': 8, 'y': 4, 'z': 10}
 
 def get_corpus():
 	first_df = pd.read_csv(CORPUS_PATH + '_1-20k.csv', usecols=['w1', 'freq'])
@@ -10,11 +14,26 @@ def get_corpus():
 	fourth_df = pd.read_csv(CORPUS_PATH + '_60-80k.csv', usecols=['w1', 'freq'])
 	fifth_df = pd.read_csv(CORPUS_PATH + '_80-100k.csv', usecols=['w1', 'freq'])
 
-	whole_corpus = pd.concat([first_df, second_df, third_df, fourth_df, fifth_df])
+	whole_corpus = pd.concat([first_df, second_df, third_df, fourth_df, fifth_df]).dropna()
+
+	# some minor operations to clean the string data
+	whole_corpus['w1'] = whole_corpus['w1'].str.normalize('NFKD')\
+		.str.encode('ascii', errors='ignore')\
+		.str.decode('utf-8')
+	whole_corpus['w1'] = whole_corpus['w1'].str.lower()
+	whole_corpus = whole_corpus.loc[whole_corpus['w1'].str.isalpha()]
 	return whole_corpus
 
+def calculate_features(corpus: pd.DataFrame):
+	corpus['length'] = corpus['w1'].str.len()
+	corpus['letters'] = corpus['w1'].str.split()
+	corpus['scrabble'] = corpus['w1'].apply(lambda x: sum([SCRABBLE_DIFFICULTY[letter] for letter in x]))
+	corpus['difficulty'] = (corpus['length'] + corpus['scrabble']) / corpus['freq']
+	print (corpus)
+
 def main():
-	print (get_corpus().head())
+	corpus = get_corpus()
+	calculate_features(corpus)
 
 if __name__ == '__main__':
 	main()
