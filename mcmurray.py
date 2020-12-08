@@ -1,4 +1,6 @@
+import matplotlib.pyplot as plt
 import pandas as pd
+import numpy as np
 import os
 
 CORPUS_PATH = os.path.join(os.path.dirname(__file__), '100k_links_b028')
@@ -22,6 +24,7 @@ def get_corpus():
 		.str.decode('utf-8')
 	whole_corpus['w1'] = whole_corpus['w1'].str.lower()
 	whole_corpus = whole_corpus.loc[whole_corpus['w1'].str.isalpha()]
+	whole_corpus['freq'] = np.log(whole_corpus['freq'])
 	return whole_corpus
 
 def calculate_features(corpus: pd.DataFrame):
@@ -29,11 +32,42 @@ def calculate_features(corpus: pd.DataFrame):
 	corpus['letters'] = corpus['w1'].str.split()
 	corpus['scrabble'] = corpus['w1'].apply(lambda x: sum([SCRABBLE_DIFFICULTY[letter] for letter in x]))
 	corpus['difficulty'] = (corpus['length'] + corpus['scrabble']) / corpus['freq']
-	print (corpus)
+	return corpus
+
+def generate_histograms(corpus: pd.DataFrame):
+	len_array = corpus['length'].values
+	freq_array = corpus['freq'].values
+	scrabble_array = corpus['scrabble'].values
+	diff_array = corpus['difficulty'].values
+
+	plt.hist(freq_array, bins=40, range=(0,20))
+	plt.xlabel('Word frequency')
+	plt.ylabel('Number of words')
+	plt.savefig('frequency_distribution.png')
+	plt.clf()
+
+	plt.hist(len_array, bins=20, range=(0,20))
+	plt.xlabel('Word length')
+	plt.ylabel('Number of words')
+	plt.savefig('len_distribution.png')
+	plt.clf()
+
+	plt.hist(scrabble_array, bins=40, range=(0,40))
+	plt.xlabel('Scrabble difficulty')
+	plt.ylabel('Number of words')
+	plt.savefig('scrabble_distribution.png')
+	plt.clf()
+
+	plt.hist(diff_array, bins=30, range=(0,30))
+	plt.xlabel('Word difficulty')
+	plt.ylabel('Number of words')
+	plt.savefig('difficulty_distribution.png')
+	plt.clf()
 
 def main():
-	corpus = get_corpus()
-	calculate_features(corpus)
+	raw_corpus = get_corpus()
+	corpus = calculate_features(raw_corpus)
+	generate_histograms(corpus)
 
 if __name__ == '__main__':
 	main()
