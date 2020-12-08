@@ -31,7 +31,7 @@ def generate_word_difficulties(vocab_size):
 
 # This is the function that runs the McMurray (2007) simulation
 
-def mcmurray(all_word_difficulties):
+def run_mcmurray(all_word_difficulties):
 
     # **
     # 1) Create a VARIABLE called 'total_steps_to_run',
@@ -84,6 +84,7 @@ def mcmurray(all_word_difficulties):
 
     # Here we save the plot to a file with the specified filename
     plt.savefig(plot_filename)
+    plt.clf()
 
 # Here we run the function 'generate_word_difficulties'
 # with input argument 10000, which allows us to create a
@@ -94,4 +95,4 @@ all_word_difficulties = generate_word_difficulties(10000)
 # Here we run the 'mcmurray' function, which runs the simulation using
 # the list of word difficulties
 
-mcmurray(all_word_difficulties)
+run_mcmurray(all_word_difficulties)
