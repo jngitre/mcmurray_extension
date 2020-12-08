@@ -35,30 +35,30 @@ def calculate_features(corpus: pd.DataFrame):
 	return corpus
 
 def generate_histograms(corpus: pd.DataFrame):
-	len_array = corpus['length'].values
-	freq_array = corpus['freq'].values
-	scrabble_array = corpus['scrabble'].values
-	diff_array = corpus['difficulty'].values
+	len_array = corpus['length'].values * 20
+	freq_array = corpus['freq'].values * 20 
+	scrabble_array = corpus['scrabble'].values * 10
+	diff_array = corpus['difficulty'].values * 20
 
-	plt.hist(freq_array, bins=40, range=(0,20))
+	plt.hist(freq_array, bins=40, range=(0,400))
 	plt.xlabel('Log word frequency')
 	plt.ylabel('Number of words')
-	plt.savefig('output/frequency_distribution.png')
+	plt.savefig('output/frequency_distribution_scaled.png')
 	plt.clf()
 
-	plt.hist(len_array, bins=20, range=(0,20))
+	plt.hist(len_array, bins=20, range=(0,400))
 	plt.xlabel('Word length')
 	plt.ylabel('Number of words')
-	plt.savefig('output/len_distribution.png')
+	plt.savefig('output/len_distribution_scaled.png')
 	plt.clf()
 
-	plt.hist(scrabble_array, bins=40, range=(0,40))
+	plt.hist(scrabble_array, bins=40, range=(0,400))
 	plt.xlabel('Scrabble difficulty')
 	plt.ylabel('Number of words')
-	plt.savefig('output/scrabble_distribution.png')
+	plt.savefig('output/scrabble_distribution_scaled.png')
 	plt.clf()
 
-	plt.hist(diff_array, bins=30, range=(0,30))
+	plt.hist(diff_array, bins=30, range=(0,400))
 	plt.xlabel('Word difficulty')
 	plt.ylabel('Number of words')
 	plt.savefig('output/difficulty_distribution.png')
@@ -86,7 +86,7 @@ def run_mcmurray(word_difficulties, difficulty_type, steps):
 
     # Here we plot the number of words known over time
     plt.plot(learning_curve)
-    plot_filename = 'output/' + difficulty_type + '_explosion_curve.png'
+    plot_filename = 'output/' + difficulty_type + '_explosion_curve_scaled.png'
 
     plt.xlabel('Time steps')
     plt.ylabel('# of words known')
@@ -97,10 +97,10 @@ def main():
 	raw_corpus = get_corpus()
 	corpus = calculate_features(raw_corpus)
 	(len_array, freq_array, scrabble_array, diff_array) = generate_histograms(corpus)
-	run_mcmurray(diff_array, 'difficulty_equation', 20)
-	run_mcmurray(freq_array, 'frequency', 20)
-	run_mcmurray(scrabble_array, 'scrabble', 40)
-	run_mcmurray(len_array, 'length', 20)
+	run_mcmurray(diff_array, 'difficulty_equation', 400)
+	run_mcmurray(freq_array, 'frequency', 400)
+	run_mcmurray(scrabble_array, 'scrabble', 400)
+	run_mcmurray(len_array, 'length', 400)
 
 if __name__ == '__main__':
 	main()
